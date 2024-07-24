@@ -1,25 +1,23 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { useDrop } from 'react-dnd';
 import Piece from './piece';
 import './square.css';
 import { GameContext } from '../App';
-import { useContext, useCallback } from 'react';
 
 const Square = ({ piece, isBlack, position, onMove }) => {
-  const { piecePossibilities, board } = useContext(GameContext);
-  console.log('a:', piecePossibilities['w1'])
-  // Function to check if the move is possible
+  const { piecePossibilities } = useContext(GameContext);
+
   const isMovePossible = (from, to, pieceLabel, piecePossibilities) => {
-    console.log('b:', piecePossibilities['w1'])
     const possibilities = piecePossibilities[pieceLabel];
     const possibleMoves = determinePossiblePieces(from, to);
     return possibilities.some(possibility => possibleMoves.includes(possibility));
   };
 
-
   const [{ isOver }, drop] = useDrop(() => ({
     accept: 'piece',
-    canDrop: (item) => isMovePossible(item.position, position, item.label, piecePossibilities),
+    canDrop: (item) => {
+      return isMovePossible(item.position, position, item.label, piecePossibilities);
+    },
     drop: (item) => {
       if (isMovePossible(item.position, position, item.label, piecePossibilities)) {
         onMove(item.position, position, item.label);
@@ -28,7 +26,7 @@ const Square = ({ piece, isBlack, position, onMove }) => {
     collect: (monitor) => ({
       isOver: !!monitor.isOver(),
     }),
-  }));
+  }), [piecePossibilities]);
 
   return (
     <div
