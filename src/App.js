@@ -1,9 +1,10 @@
-import React, { createContext, useState } from 'react';
+import React, { createContext, useEffect, useState } from 'react';
 import Chessboard from './components/chessboard';
 import './App.css';
 import {Navbar} from "./components/navbar";
 import {Infobar} from "./components/infobar";
 import Modal from 'react-modal';
+import Piece from './components/piece';
 
 
 const initialBoard = [
@@ -157,30 +158,6 @@ const App = () => {
       const currentPossibilities = prevState[piece];
       let intersectPossibilities = currentPossibilities.filter(value => possibilities.includes(value));
 
-      // If the piece has been determined to be a QUEEN, update the possibilities for other pieces
-      if (intersectPossibilities.length === 1) {
-        const color = piece[0]; // 'w' or 'b'
-        let remaining = intersectPossibilities[0];
-
-        setAvailablePieces(prevState =>  {
-          let prevColorState = prevState[color]
-          let newAvailable = ({
-            ...prevState,
-            [color]: {...prevColorState, [remaining]: prevState[color][remaining] - 1}
-          });
-          return newAvailable
-        });
-
-        // Update the possibilities for all other pieces of the same color
-        const newPiecePossibilities = prevState;
-        for (const key in prevState) {
-          if (key !== piece && key[0] === color && availablePieces[color][remaining] === 0 && newPiecePossibilities[key][0] !== remaining) {
-            newPiecePossibilities[key] = newPiecePossibilities[key].filter(value => value !== remaining);
-          }
-        }
-
-      }
-
       return {
         ...prevState,
         [piece]: intersectPossibilities,
@@ -208,6 +185,56 @@ const App = () => {
       };
     });
   };
+
+  useEffect(() => {
+
+    for (const piece in piecePossibilities) {
+      if (piecePossibilities[piece].length === 1) {
+        setAvailablePieces(prevState =>  {
+          let color = piece[0];
+          let prevColorState = prevState[color];
+          let remaining = piecePossibilities[piece][0];
+          let newAvailable = ({
+            ...prevState,
+            [color]: {...prevColorState, [remaining]: Math.max(prevState[color][remaining] - 1, 0)}
+          });
+          return newAvailable
+        });
+      }
+    }
+
+  }, [piecePossibilities]);
+
+  useEffect(() => {
+    setPiecePossibilities(prevState => {
+      const newPiecePossibilities = prevState;
+      for (const key in newPiecePossibilities) {
+        for (const color of ['w', 'b']) {
+          for (const piece in availablePieces[color]) {
+            if (key[0] === color && availablePieces[color][piece] === 0 && !arraysEqual(newPiecePossibilities[key], [piece])) {
+              newPiecePossibilities[key] = newPiecePossibilities[key].filter(value => value !== piece);
+            }
+          }
+        }
+      }
+      return newPiecePossibilities;
+    })
+  }, [availablePieces])
+
+  function arraysEqual(arr1, arr2) {
+    if (arr1.length !== arr2.length) {
+      return false;
+    }
+
+    for (let i = 0; i < arr1.length; i++) {
+      if (arr1[i] !== arr2[i]) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
   const [modalIsOpen, setModalIsOpen] = useState(false);
 
   const openModal = () => {
