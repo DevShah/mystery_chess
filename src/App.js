@@ -1,6 +1,8 @@
 import React, { createContext, useState } from 'react';
 import Chessboard from './components/chessboard';
 import './App.css';
+import {Navbar} from "./components/navbar";
+import {Infobar} from "./components/infobar"
 
 const initialBoard = [
   ['w1', 'w2', 'w3', 'w4', 'w5', 'w6', 'w7', 'w8'],
@@ -87,6 +89,27 @@ const App = () => {
     'b16': ['KING', 'QUEEN', 'ROOK', 'BISHOP', 'KNIGHT', 'PAWN'],
   });
 
+  const [hover, setHover] = useState("");
+
+  const [availablePieces, setAvailablePieces] = useState({
+    "w": {
+      "QUEEN": 1,
+      "KING": 1,
+      "PAWN": 8,
+      "ROOK": 2,
+      "BISHOP": 2,
+      "KNIGHT": 2
+    },
+    "b": {
+      "QUEEN": 1,
+      "KING": 1,
+      "PAWN": 8,
+      "ROOK": 2,
+      "BISHOP": 2,
+      "KNIGHT": 2
+    }
+  })
+
   const determinePossiblePieces = (from, to) => {
     const [fromX, fromY] = from;
     const [toX, toY] = to;
@@ -94,7 +117,7 @@ const App = () => {
     const possiblePieces = [];
 
     // Pawn
-    if (fromX === toX && (toY === fromY + 1 || toY === fromY - 1)) {
+    if (fromY === toY && (toX === fromX + 1 || toX === fromX - 1)) {
       possiblePieces.push('PAWN');
     }
 
@@ -131,9 +154,34 @@ const App = () => {
     setPiecePossibilities(prevState => {
       const currentPossibilities = prevState[piece];
       let intersectPossibilities = currentPossibilities.filter(value => possibilities.includes(value));
+
+      // If the piece has been determined to be a QUEEN, update the possibilities for other pieces
+      if (intersectPossibilities.length === 1) {
+        const color = piece[0]; // 'w' or 'b'
+        let remaining = intersectPossibilities[0];
+
+        setAvailablePieces(prevState =>  {
+          let prevColorState = prevState[color]
+          let newAvailable = ({
+            ...prevState,
+            [color]: {...prevColorState, [remaining]: prevState[color][remaining] - 1}
+          });
+          return newAvailable
+        });
+
+        // Update the possibilities for all other pieces of the same color
+        const newPiecePossibilities = prevState;
+        for (const key in prevState) {
+          if (key !== piece && key[0] === color && availablePieces[color][remaining] === 0 && newPiecePossibilities[key][0] !== remaining) {
+            newPiecePossibilities[key] = newPiecePossibilities[key].filter(value => value !== remaining);
+          }
+        }
+
+      }
+
       return {
         ...prevState,
-        [piece]: intersectPossibilities
+        [piece]: intersectPossibilities,
       };
     });
 
@@ -147,16 +195,15 @@ const App = () => {
       const newHistory = [...currentHistory, to];
       return {
         ...prevState,
-        [piece]: newHistory
+        [piece]: newHistory,
       };
     });
   };
 
-  // console.log(piecePossibilities);
-
-
   return (
-    <GameContext.Provider value={{ board, history, piecePossibilities, handleMove }}>
+    <GameContext.Provider value={{ board, history, piecePossibilities, handleMove, setHover }}>
+      <Navbar />
+      <Infobar hover={hover}/>
       <h1>Mystery Chess</h1>
       <div className="chessboard-container">
         <Chessboard />

@@ -58,3 +58,12 @@ body {
 h1 {
   text-align: center;
 }
+
+.content {
+  padding-top: 60px; /* Add padding to avoid content being hidden behind the navbar */
+}
+
+section {
+  padding: 60px 20px;
+  border-bottom: 1px solid #ddd;
+}
