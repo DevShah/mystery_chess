@@ -92,9 +92,7 @@ const App = () => {
     'b16': ['KING', 'QUEEN', 'ROOK', 'BISHOP', 'KNIGHT', 'PAWN'],
   });
 
-  const [hover, setHover] = useState("");
-
-  const [availablePieces, setAvailablePieces] = useState({
+  const totalPieces = {
     "w": {
       "QUEEN": 1,
       "KING": 1,
@@ -111,7 +109,11 @@ const App = () => {
       "BISHOP": 2,
       "KNIGHT": 2
     }
-  })
+  }
+
+  const [availablePieces, setAvailablePieces] = useState(totalPieces);
+
+  const [hover, setHover] = useState("");
 
   const determinePossiblePieces = (from, to) => {
     const [fromX, fromY] = from;
@@ -186,24 +188,57 @@ const App = () => {
     });
   };
 
+  /**
+   * Update the available pieces based of the existing state
+   */
   useEffect(() => {
-
-    for (const piece in piecePossibilities) {
-      if (piecePossibilities[piece].length === 1) {
-        setAvailablePieces(prevState =>  {
-          let color = piece[0];
-          let prevColorState = prevState[color];
-          let remaining = piecePossibilities[piece][0];
-          let newAvailable = ({
-            ...prevState,
-            [color]: {...prevColorState, [remaining]: Math.max(prevState[color][remaining] - 1, 0)}
-          });
-          return newAvailable
-        });
+    let countAvail = {
+      "w": {
+        "QUEEN": 0,
+        "KING": 0,
+        "PAWN": 0,
+        "ROOK": 0,
+        "BISHOP": 0,
+        "KNIGHT": 0
+      },
+      "b": {
+        "QUEEN": 0,
+        "KING": 0,
+        "PAWN": 0,
+        "ROOK": 0,
+        "BISHOP": 0,
+        "KNIGHT": 0
+      }
+    }
+    for (const color of ['w', 'b']) {
+      for (const pieceType in availablePieces[color]) {
+        for (const piece in piecePossibilities){
+          if (arraysEqual([pieceType], piecePossibilities[piece])) {
+            countAvail[color][pieceType] += 1
+          }
+        }
       }
     }
 
+    setAvailablePieces(subtractNestedObjects(totalPieces, countAvail))
+
   }, [piecePossibilities]);
+
+  function subtractNestedObjects(obj1, obj2) {
+    const result = {};
+
+    for (const key in obj1) {
+      if (obj1.hasOwnProperty(key) && obj2.hasOwnProperty(key)) {
+        if (typeof obj1[key] === 'object' && typeof obj2[key] === 'object') {
+          result[key] = subtractNestedObjects(obj1[key], obj2[key]);
+        } else {
+          result[key] = obj1[key] - obj2[key];
+        }
+      }
+    }
+
+    return result;
+  }
 
   useEffect(() => {
     setPiecePossibilities(prevState => {
