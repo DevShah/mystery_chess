@@ -188,6 +188,13 @@ const App = () => {
     });
 
     const newBoard = [...board];
+    const capturedPiece = newBoard[to[0]][to[1]];
+
+    if (capturedPiece && capturedPiece[0] !== piece[0]) {
+      alert(`${capturedPiece} has been captured!`);
+      newBoard[to[0]][to[1]] = null; // Remove the captured piece from the board
+    }
+
     newBoard[to[0]][to[1]] = newBoard[from[0]][from[1]];
     newBoard[from[0]][from[1]] = null;
     setBoard(newBoard);

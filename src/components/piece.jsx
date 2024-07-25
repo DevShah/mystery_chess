@@ -22,7 +22,7 @@ const Piece = ({ type, color, position, label }) => {
       ref={drag}
       className={`piece ${color}`}
       style={{ opacity: isDragging ? 0.5 : 1 }}
-      onMouseOver={() =>setHover(piecePossibilities[label].join(", "))}
+      onMouseOver={() => setHover(position + ": " + piecePossibilities[label].join(", "))}
       onMouseOut={() => setHover('')}
     >
       {type === 'w' && '♔'}
