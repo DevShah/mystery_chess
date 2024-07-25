@@ -10,8 +10,8 @@ export const Navbar = ({onHover}) => {
           <a href="/" className="nav-link">New Game</a>
         </li>
         <li className="nav-item">
-          <a href="#about" className="nav-link">How to play
-          </a>
+          <div className="nav-link">How to play
+          </div>
         </li>
       </ul>
     </nav>

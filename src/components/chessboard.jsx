@@ -4,23 +4,36 @@ import { GameContext } from '../App';
 import './chessboard.css';
 
 const Chessboard = () => {
-
   const { board, handleMove } = useContext(GameContext);
+
+  const renderSquare = (piece, i, j) => (
+    <Square
+      key={`${i}-${j}`}
+      piece={piece}
+      isBlack={(i + j) % 2 === 1}
+      position={[i, j]}
+      onMove={handleMove}
+    />
+  );
+
+  const renderRow = (row, i) => (
+    <div key={i} className="row">
+      <div className="row-label">{8 - i}</div>
+      {row.map((piece, j) => renderSquare(piece, i, j))}
+    </div>
+  );
+
   return (
-    <div className="chessboard">
-      {board.map((row, i) => (
-        <div key={i} className="row">
-          {row.map((piece, j) => (
-            <Square
-              key={j}
-              piece={piece}
-              isBlack={(i + j) % 2 === 1}
-              position={[i, j]}
-              onMove={handleMove}
-            />
-          ))}
-        </div>
-      ))}
+    <div className="chessboard-container">
+      <div className="chessboard">
+        {board.map((row, i) => renderRow(row, i))}
+      </div>
+      <div className="column-labels">
+        <div className="corner"></div>
+        {'abcdefgh'.split('').map((label, i) => (
+          <div key={i} className="column-label">{label}</div>
+        ))}
+      </div>
     </div>
   );
 };

@@ -214,11 +214,11 @@ const App = () => {
   return (
     <GameContext.Provider value={{ board, history, piecePossibilities, handleMove, setHover }}>
       <Navbar onHover={openModal}/>
-      <Infobar hover={hover}/>
       <h1>Mystery Chess</h1>
       <div className="chessboard-container">
         <Chessboard />
       </div>
+      <Infobar hover={hover}/>
       <Modal
           isOpen={modalIsOpen}
           onRequestClose={closeModal}
