@@ -128,6 +128,9 @@ const App = () => {
     else if (fromY === toY && (toX === fromX + 2 || toX === fromX - 2) && history[pieceLabel].length <= 1) {
       possiblePieces.push('PAWN');
     }
+    else if (board[toX][toY] !== "null" && (fromY === toY + 1 || fromY === toY - 1) && (toX === fromX + 1 || toX === fromX - 1)) {
+      possiblePieces.push('PAWN')
+    }
 
     // Rook
     if (fromX === toX || fromY === toY) {
@@ -216,7 +219,7 @@ const App = () => {
     for (const color of ['w', 'b']) {
       for (const pieceType in availablePieces[color]) {
         for (const piece in piecePossibilities){
-          if (arraysEqual([pieceType], piecePossibilities[piece])) {
+          if (arraysEqual([pieceType], piecePossibilities[piece]) && color === piece[0]) {
             countAvail[color][pieceType] += 1
           }
         }
@@ -243,6 +246,9 @@ const App = () => {
     return result;
   }
 
+  /**
+   * Update state of each piece
+   */
   useEffect(() => {
     setPiecePossibilities(prevState => {
       const newPiecePossibilities = prevState;
