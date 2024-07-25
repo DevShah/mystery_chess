@@ -42,3 +42,17 @@ body {
   background-color: #ddd;
   color: black;
 }
+
+
+.rules-container {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 300px;
+  z-index: 1001; /* Ensure it stays on top of the navbar */
+}
+
+.navbar-brand:hover .rules-container {
+  display: block;
+}

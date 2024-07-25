@@ -2,7 +2,9 @@ import React, { createContext, useState } from 'react';
 import Chessboard from './components/chessboard';
 import './App.css';
 import {Navbar} from "./components/navbar";
-import {Infobar} from "./components/infobar"
+import {Infobar} from "./components/infobar";
+import Modal from 'react-modal';
+
 
 const initialBoard = [
   ['w1', 'w2', 'w3', 'w4', 'w5', 'w6', 'w7', 'w8'],
@@ -199,15 +201,39 @@ const App = () => {
       };
     });
   };
+  const [modalIsOpen, setModalIsOpen] = useState(false);
+
+  const openModal = () => {
+    setModalIsOpen(true);
+  };
+
+  const closeModal = () => {
+    setModalIsOpen(false);
+  };
 
   return (
     <GameContext.Provider value={{ board, history, piecePossibilities, handleMove, setHover }}>
-      <Navbar />
+      <Navbar onHover={openModal}/>
       <Infobar hover={hover}/>
       <h1>Mystery Chess</h1>
       <div className="chessboard-container">
         <Chessboard />
       </div>
+      <Modal
+          isOpen={modalIsOpen}
+          onRequestClose={closeModal}
+          contentLabel="Game Rules"
+          className="modal"
+          overlayClassName="modal-overlay"
+        >
+          <h2>Game Rules</h2>
+          <p>Mystery Chess is a game in which the identity of the pieces are deterministic. At the beginning of the game, each piece has the ability to move as any chess piece. The game works similarly to chess in that there are 8 pawns, 2 rooks, 2 bishops, 2 knights, 1 queen and 1 king. </p>
+          <p>For example, if you move a piece from A2 to C3, you have moved the piece diagonally two squares. This means that piece can be either a bishop or a queen. If you choose to once again move that piece from C3 to D3, that piece can only be a queen. Note: this also means none of your other pieces can assume the queen role.</p>
+          <p>The game automatically keeps track of each piece's game state. So even if you had intentionally pre-selected a piece to be King, and it gets captured, the state will transfer to another piece if possible.</p>
+
+          <p>The game completes when one of the King pieces is revealed and captured.</p>
+          <button onClick={closeModal}>Close</button>
+        </Modal>
     </GameContext.Provider>
   );
 };
