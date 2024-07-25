@@ -1,6 +1,5 @@
 import React from 'react';
 import './navbar.css';
-import {Rules} from "./rules"
 
 export const Navbar = ({onHover}) => {
   return (

@@ -5,11 +5,11 @@ import './square.css';
 import { GameContext } from '../App';
 
 const Square = ({ piece, isBlack, position, onMove }) => {
-  const { piecePossibilities, board } = useContext(GameContext);
+  const { piecePossibilities, board, history } = useContext(GameContext);
 
   const isMovePossible = (from, to, pieceLabel, piecePossibilities, board) => {
     const possibilities = piecePossibilities[pieceLabel];
-    const possibleMoves = determinePossiblePieces(from, to);
+    const possibleMoves = determinePossiblePieces(from, to, pieceLabel, history);
 
     // Check if the destination position contains a piece of the same color
     const destinationPiece = board[to[0]][to[1]];
@@ -94,14 +94,18 @@ const Square = ({ piece, isBlack, position, onMove }) => {
 };
 
 // Helper function to determine possible pieces that could make a move
-const determinePossiblePieces = (from, to) => {
+const determinePossiblePieces = (from, to, pieceLabel, history) => {
   const [fromX, fromY] = from;
   const [toX, toY] = to;
 
   const possiblePieces = [];
 
+
   // Pawn
-  if (fromX === toX && (toY === fromY + 1 || toY === fromY - 1)) {
+  if (fromY === toY && (toX === fromX + 1 || toX === fromX - 1)) {
+    possiblePieces.push('PAWN');
+  }
+  else if (fromY === toY && (toX === fromX + 2 || toX === fromX - 2) && history[pieceLabel].length <= 1) {
     possiblePieces.push('PAWN');
   }
 

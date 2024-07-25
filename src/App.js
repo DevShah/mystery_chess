@@ -115,7 +115,7 @@ const App = () => {
 
   const [hover, setHover] = useState("");
 
-  const determinePossiblePieces = (from, to) => {
+  const determinePossiblePieces = (from, to, pieceLabel) => {
     const [fromX, fromY] = from;
     const [toX, toY] = to;
 
@@ -123,6 +123,9 @@ const App = () => {
 
     // Pawn
     if (fromY === toY && (toX === fromX + 1 || toX === fromX - 1)) {
+      possiblePieces.push('PAWN');
+    }
+    else if (fromY === toY && (toX === fromX + 2 || toX === fromX - 2) && history[pieceLabel].length <= 1) {
       possiblePieces.push('PAWN');
     }
 
@@ -155,7 +158,7 @@ const App = () => {
   };
 
   const handleMove = (from, to, piece) => {
-    const possibilities = determinePossiblePieces(from, to);
+    const possibilities = determinePossiblePieces(from, to, piece);
     setPiecePossibilities(prevState => {
       const currentPossibilities = prevState[piece];
       let intersectPossibilities = currentPossibilities.filter(value => possibilities.includes(value));
