@@ -9,11 +9,11 @@ const Square = ({ piece, isBlack, position, onMove }) => {
 
   const isMovePossible = (from, to, pieceLabel, piecePossibilities, board) => {
     const possibilities = piecePossibilities[pieceLabel];
-    const possibleMoves = determinePossiblePieces(from, to, pieceLabel, history);
-
+    const possibleMoves = determinePossiblePieces(from, to, pieceLabel, history, board);
     // Check if the destination position contains a piece of the same color
     const destinationPiece = board[to[0]][to[1]];
-    if (destinationPiece && destinationPiece[0] === pieceLabel[0]) {
+    const fromPiece = board[from[0]][from[1]]
+    if (destinationPiece && destinationPiece[0] === fromPiece[0]) {
       return false; // Cannot move on top of a piece of the same color
     }
 
@@ -27,13 +27,11 @@ const Square = ({ piece, isBlack, position, onMove }) => {
     if (possibilities.includes('KNIGHT') && possibleMoves.includes('KNIGHT')) {
       return true; // Knights can jump over other pieces
     }
-
     // Check if the path is clear for non-knight pieces
     const isPathClear = checkPathClear(from, to, board);
     if (!isPathClear) {
       return false;
     }
-
     return true;
   };
 
@@ -94,7 +92,7 @@ const Square = ({ piece, isBlack, position, onMove }) => {
 };
 
 // Helper function to determine possible pieces that could make a move
-const determinePossiblePieces = (from, to, pieceLabel, history) => {
+const determinePossiblePieces = (from, to, pieceLabel, history, board) => {
   const [fromX, fromY] = from;
   const [toX, toY] = to;
 
@@ -102,11 +100,14 @@ const determinePossiblePieces = (from, to, pieceLabel, history) => {
 
 
   // Pawn
-  if (fromY === toY && (toX === fromX + 1 || toX === fromX - 1)) {
+  if (fromY === toY && (toX === fromX + 1 || toX === fromX - 1)  && board[toX][toY] === null) {
     possiblePieces.push('PAWN');
   }
-  else if (fromY === toY && (toX === fromX + 2 || toX === fromX - 2) && history[pieceLabel].length <= 1) {
+  else if (fromY === toY && (toX === fromX + 2 || toX === fromX - 2) && history[pieceLabel].length <= 1  && board[toX][toY] === null) {
     possiblePieces.push('PAWN');
+  }
+  else if (board[toX][toY] !== "null" && (fromY === toY + 1 || fromY === toY - 1) && (toX === fromX + 1 || toX === fromX - 1) && board[toX][toY] !== null) {
+    possiblePieces.push('PAWN')
   }
 
   // Rook
