@@ -128,7 +128,7 @@ const App = () => {
     else if (fromY === toY && (toX === fromX + 2 || toX === fromX - 2) && history[pieceLabel].length <= 1) {
       possiblePieces.push('PAWN');
     }
-    else if (board[toX][toY] !== "null" && (fromY === toY + 1 || fromY === toY - 1) && (toX === fromX + 1 || toX === fromX - 1)) {
+    else if (board[toX][toY] !== null && (fromY === toY + 1 || fromY === toY - 1) && (toX === fromX + 1 || toX === fromX - 1)) {
       possiblePieces.push('PAWN')
     }
 
@@ -263,6 +263,13 @@ const App = () => {
       }
       return newPiecePossibilities;
     })
+
+    if (availablePieces["w"]["KING"] === 0) {
+      alert("Black Wins")
+    }
+    else if (availablePieces["b"]["KING"] === 0) {
+      alert("Black Wins")
+    }
   }, [availablePieces])
 
   function arraysEqual(arr1, arr2) {
@@ -304,7 +311,7 @@ const App = () => {
           className="modal"
           overlayClassName="modal-overlay"
         >
-          <h2>Game Rules</h2>
+          <h2 style={{"text-align": "center"}}>Game Rules</h2>
           <p>Mystery Chess is a game in which the identity of the pieces are deterministic. At the beginning of the game, each piece has the ability to move as any chess piece. The game works similarly to chess in that there are 8 pawns, 2 rooks, 2 bishops, 2 knights, 1 queen and 1 king. Bishops may be the same color. There is no castling or en passant in this game.</p>
           <p>For example, if you move a piece from A2 to C4, you have moved the piece diagonally two squares. This means that piece can be either a bishop or a queen. If you choose to once again move that piece from C4 to D4, that piece can only be a queen. Note: this also means none of your other pieces can assume the queen role.</p>
           <p>The game automatically keeps track of each piece's game state. So even if you had intentionally pre-selected a piece to be King, and it gets captured, the state will transfer to another piece if possible.</p>
