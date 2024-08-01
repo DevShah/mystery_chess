@@ -8,7 +8,7 @@ const Square = ({ piece, isBlack, position, onMove }) => {
   const { piecePossibilities, board, history } = useContext(GameContext);
 
   const isMovePossible = (from, to, pieceLabel, piecePossibilities, board) => {
-    const possibilities = piecePossibilities[pieceLabel];
+    const possibilities = piecePossibilities[board[from[0]][from[1]]];
     const possibleMoves = determinePossiblePieces(from, to, pieceLabel, history, board);
     // Check if the destination position contains a piece of the same color
     const destinationPiece = board[to[0]][to[1]];

@@ -122,13 +122,13 @@ const App = () => {
     const possiblePieces = [];
 
     // Pawn
-    if (fromY === toY && (toX === fromX + 1 || toX === fromX - 1)) {
+    if (fromY === toY && ((pieceLabel[0] === 'w' && toX === fromX + 1) || (pieceLabel[0] === 'b' && toX === fromX - 1))) {
       possiblePieces.push('PAWN');
     }
-    else if (fromY === toY && (toX === fromX + 2 || toX === fromX - 2) && history[pieceLabel].length <= 1) {
+    else if (fromY === toY && ((pieceLabel[0] === 'w' && toX === fromX + 2) || (pieceLabel[0] === 'b' && toX === fromX - 2)) && history[pieceLabel].length <= 1) {
       possiblePieces.push('PAWN');
     }
-    else if (board[toX][toY] !== null && (fromY === toY + 1 || fromY === toY - 1) && (toX === fromX + 1 || toX === fromX - 1)) {
+    else if (board[toX][toY] !== null && ((pieceLabel[0] === 'w' && toX === fromX + 1 && (fromY === toY + 1 || fromY === toY - 1)) || (pieceLabel[0] === 'b' && toX === fromX - 1 && (fromY === toY + 1 || fromY === toY - 1)))) {
       possiblePieces.push('PAWN')
     }
 
@@ -160,29 +160,34 @@ const App = () => {
     return possiblePieces;
   };
 
-  const handleMove = (from, to, piece) => {
+  const handleMove = (from, to) => {
+    const newBoard = [...board];
+    const piece = newBoard[from[0]][from[1]];
     const possibilities = determinePossiblePieces(from, to, piece);
+    const capturedPiece = newBoard[to[0]][to[1]];
     setPiecePossibilities(prevState => {
       const currentPossibilities = prevState[piece];
       let intersectPossibilities = currentPossibilities.filter(value => possibilities.includes(value));
+      let newState = prevState;
+      if (capturedPiece && capturedPiece[0] !== piece[0]) {
+        newBoard[to[0]][to[1]] = newBoard[from[0]][from[1]]; // Remove the captured piece from the board
+        newState[capturedPiece] = [];
+      }
 
       return {
-        ...prevState,
+        ...newState,
         [piece]: intersectPossibilities,
       };
     });
 
-    const newBoard = [...board];
-    const capturedPiece = newBoard[to[0]][to[1]];
 
-    if (capturedPiece && capturedPiece[0] !== piece[0]) {
-      alert(`${capturedPiece} has been captured!`);
-      newBoard[to[0]][to[1]] = newBoard[from[0]][from[1]]; // Remove the captured piece from the board
-    }
+
+
 
     newBoard[to[0]][to[1]] = newBoard[from[0]][from[1]];
     newBoard[from[0]][from[1]] = null;
     setBoard(newBoard);
+
 
     setHistory(prevState => {
       const currentHistory = prevState[piece];
@@ -216,18 +221,34 @@ const App = () => {
         "KNIGHT": 0
       }
     }
+    let count_white_kings = 0;
+    let count_black_kings = 0;
     for (const color of ['w', 'b']) {
       for (const pieceType in availablePieces[color]) {
         for (const piece in piecePossibilities){
           if (arraysEqual([pieceType], piecePossibilities[piece]) && color === piece[0]) {
             countAvail[color][pieceType] += 1
           }
+          if (piecePossibilities[piece].includes('KING')) {
+            if (piece[0] === 'b'){
+              count_black_kings += 1
+            }
+            else {
+              count_white_kings += 1
+            }
+          }
         }
       }
     }
 
-    setAvailablePieces(subtractNestedObjects(totalPieces, countAvail))
+    if (count_white_kings === 0 ){
+      alert('Black Wins')
+    }
+    else if (count_black_kings === 0) {
+      alert('White Wins')
+    }
 
+    setAvailablePieces(subtractNestedObjects(totalPieces, countAvail))
   }, [piecePossibilities]);
 
   function subtractNestedObjects(obj1, obj2) {
@@ -264,12 +285,6 @@ const App = () => {
       return newPiecePossibilities;
     })
 
-    if (availablePieces["w"]["KING"] === 0) {
-      alert("Black Wins")
-    }
-    else if (availablePieces["b"]["KING"] === 0) {
-      alert("Black Wins")
-    }
   }, [availablePieces])
 
   function arraysEqual(arr1, arr2) {
