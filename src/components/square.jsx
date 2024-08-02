@@ -5,7 +5,7 @@ import './square.css';
 import { GameContext } from '../App';
 
 const Square = ({ piece, isBlack, position, onMove }) => {
-  const { piecePossibilities, board, history } = useContext(GameContext);
+  const { piecePossibilities, board, history, playerTurn } = useContext(GameContext);
 
   const isMovePossible = (from, to, pieceLabel, piecePossibilities, board) => {
     const possibilities = piecePossibilities[board[from[0]][from[1]]];
@@ -61,6 +61,11 @@ const Square = ({ piece, isBlack, position, onMove }) => {
   const [{ isOver }, drop] = useDrop(() => ({
     accept: 'piece',
     canDrop: (item) => {
+      if (playerTurn && item.label[0] === 'w') {
+        return false;
+      } else if (!playerTurn && item.label[0] === 'b') {
+        return false;
+      }
       return isMovePossible(item.position, position, item.label, piecePossibilities, board);
     },
     drop: (item) => {
