@@ -386,13 +386,6 @@ const App = () => {
     return result;
   }
 
-  /**
-   * Update state of each piece
-   */
-  // useEffect(() => {
-  //   setTurnEnded(turnEnded + 1);
-  // }, [availablePieces])
-
   function arraysEqual(arr1, arr2) {
     if (arr1.length !== arr2.length) {
       return false;

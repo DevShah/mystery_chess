@@ -7,12 +7,13 @@ import { GameContext } from '../App';
 const Square = ({ piece, isBlack, position, onMove }) => {
   const { piecePossibilities, board, history, playerTurn } = useContext(GameContext);
 
-  const isMovePossible = (from, to, pieceLabel, piecePossibilities, board) => {
+  const isMovePossible = (from, to, pieceLabel) => {
     const possibilities = piecePossibilities[board[from[0]][from[1]]];
     const possibleMoves = determinePossiblePieces(from, to, pieceLabel, history, board);
     // Check if the destination position contains a piece of the same color
     const destinationPiece = board[to[0]][to[1]];
-    const fromPiece = board[from[0]][from[1]]
+    const fromPiece = board[from[0]][from[1]];
+
     if (destinationPiece && destinationPiece[0] === fromPiece[0]) {
       return false; // Cannot move on top of a piece of the same color
     }
@@ -61,16 +62,20 @@ const Square = ({ piece, isBlack, position, onMove }) => {
   const [{ isOver }, drop] = useDrop(() => ({
     accept: 'piece',
     canDrop: (item) => {
-      if (playerTurn && item.label[0] === 'w') {
+      let piece = board[item.position[0]][item.position[1]];
+
+      if (playerTurn && piece[0] === 'w') {
         return false;
-      } else if (!playerTurn && item.label[0] === 'b') {
+      } else if (!playerTurn && piece[0] === 'b') {
         return false;
       }
-      return isMovePossible(item.position, position, item.label, piecePossibilities, board);
+
+      return isMovePossible(item.position, position, piece);
     },
     drop: (item) => {
-      if (isMovePossible(item.position, position, item.label, piecePossibilities, board)) {
-        onMove(item.position, position, item.label);
+      let piece = board[item.position[0]][item.position[1]];
+      if (isMovePossible(item.position, position, piece)) {
+        onMove(item.position, position, piece);
       }
     },
     collect: (monitor) => ({
